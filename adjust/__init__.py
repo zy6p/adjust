@@ -12,7 +12,7 @@ class Daoxian:
         self.corners = pd.DataFrame({"node1": [], "node2": [], "node3": [], "value": []})
         self.known_poi = pd.DataFrame({"poi_name": [], "poi_x": [], "poi_y": []})
         self.error = {"edge": [], "corner": []}
-        self.params = []
+        self.params = pd.DataFrame({'ox': [], 'oy': []})
         self.p_weight_matrix = []
 
     def check_info(self):
@@ -77,7 +77,8 @@ class Daoxian:
         return True
 
     def init_error(self):
-        p_weight_edge = [np.power(self.error['corner'] / self.error['edge'] / i / 100, 2) for i in self.edges['value'] if i > 0]
+        p_weight_edge = [np.power(self.error['corner'] / self.error['edge'] / i / 100, 2) for i in self.edges['value']
+                         if i > 0]
         p_weight_matrix = [1 for i in range(len(self.corners))]
         p_weight_matrix.extend(p_weight_edge)
         self.p_weight_matrix = np.diag(p_weight_matrix)
@@ -86,23 +87,33 @@ class Daoxian:
         b_coefficient = np.zeros(np.shape(self.p_weight_matrix))
         params = self.params
 
+        edge_function = self.edges
+        edge_function = edge_function[~edge_function['value'].isin([0])]
+
+        edge_function_index = [edge_function['node1']]
+
         l_observation_corner = [i for i in self.corners['value']]
         l_observation_edge = [i for i in self.edges['value'] if i > 0]
         l_observation_corner.extend(l_observation_edge)
-        l_observation = np.array(l_observation_corner).T
+        l_observation = np.array(l_observation_corner).reshape((-1, 1))
 
         x_params = [i for i in self.params['ox'] if i != 0]
         x_params.extend([i for i in self.params['oy'] if i != 0])
-        # for corner
 
+        for i in range(100):
+            _all_xy_coordinate = self.params
+            for poi in range(len(self.known_poi)):
+                _all_xy_coordinate['ox'][self.known_poi['poi_name'][poi]] = self.known_poi['poi_x'][poi]
+                _all_xy_coordinate['oy'][self.known_poi['poi_name'][poi]] = self.known_poi['poi_y'][poi]
+
+            _delta_x_jk = _all_xy_coordinate['ox'][edge_function['node1']].values - _all_xy_coordinate['ox'][
+                edge_function['node2']].values
+            _delta_y_jk = _all_xy_coordinate['oy'][edge_function['node1']].values - _all_xy_coordinate['ox'][
+                edge_function['node2']].values
+            _s_jk = np.power(np.power(_delta_x_jk, 2) + np.power(_delta_y_jk, 2), 0.5)
+            l_observation_residual = l_observation
+        # for corner
 
         # for edge
 
-
-
         return True
-
-
-
-
-
