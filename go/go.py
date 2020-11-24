@@ -36,4 +36,5 @@ info3 = '''已知点：4 x=97.478(m), y=155.682(m)
 dx_test = Daoxian(info1, info2, info3)
 dx_test.check_info()
 dx_test.init_params()
-
+dx_test.init_error()
+dx_test.cal()
