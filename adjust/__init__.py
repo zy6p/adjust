@@ -138,16 +138,16 @@ class Daoxian:
             _edge_delta_y_jk = _all_xy_coordinate['oy'][edge_function['node1']] - _all_xy_coordinate[
                 'oy'][edge_function['node2']]
             _edge_s_jk = np.power(np.power(_edge_delta_x_jk, 2) + np.power(_edge_delta_y_jk, 2), 0.5)
+            _edge_c_jk = _edge_delta_x_jk / _edge_s_jk
+            _edge_d_jk = _edge_delta_y_jk / _edge_s_jk
             for ii in range(n_num_edge):
-                b_coefficient[ii + n_num_corner][self.params['ox_index'][self.edges['node1'][ii]]] =\
-                    - _edge_delta_x_jk[ii] / _edge_s_jk[ii]
-                b_coefficient[ii + n_num_corner][self.params['oy_index'][self.edges['node1'][ii]]] =\
-                    - _edge_delta_y_jk[ii] / _edge_s_jk[ii]
-                b_coefficient[ii + n_num_corner][self.params['ox_index'][self.edges['node2'][ii]]] =\
-                    _edge_delta_x_jk[ii] / _edge_s_jk[ii]
-                b_coefficient[ii + n_num_corner][self.params['oy_index'][self.edges['node2'][ii]]] =\
-                    _edge_delta_y_jk[ii] / _edge_s_jk[ii]
-                l_observation[ii + n_num_corner] = l_observation[ii + n_num_corner] - _edge_s_jk[ii]
+                if self.params['ox_index'][self.edges['node1'][ii]] >= 0:
+                    b_coefficient[ii + n_num_corner][self.params['ox_index'][self.edges['node1'][ii]]] = - _edge_c_jk[ii]
+                    b_coefficient[ii + n_num_corner][self.params['oy_index'][self.edges['node1'][ii]]] = - _edge_d_jk[ii]
+                if self.params['ox_index'][self.edges['node2'][ii]] >= 0:
+                    b_coefficient[ii + n_num_corner][self.params['ox_index'][self.edges['node2'][ii]]] = _edge_c_jk[ii]
+                    b_coefficient[ii + n_num_corner][self.params['oy_index'][self.edges['node2'][ii]]] = _edge_d_jk[ii]
+                l_observation_residual[ii + n_num_corner] = l_observation[ii + n_num_corner] - _edge_s_jk[ii]
             # for corner
             _corner_delta_x_jk = _all_xy_coordinate['ox'][corner_function['node2']] - _all_xy_coordinate['ox'][
                 corner_function['node3']]
@@ -164,15 +164,18 @@ class Daoxian:
             _corner_a_jh = self.rho * _corner_delta_y_jh / _corner_s_jh_power2
             _corner_b_jh = - self.rho * _corner_delta_x_jh / _corner_s_jh_power2
             for ii in range(n_num_corner):
-                b_coefficient[ii][self.params['ox_index'][self.corners['node1'][ii]]] = _corner_a_jh[ii]
-                b_coefficient[ii][self.params['oy_index'][self.corners['node1'][ii]]] = _corner_b_jh[ii]
-                b_coefficient[ii][self.params['ox_index'][self.corners['node2'][ii]]] = _corner_a_jk[ii] - _corner_a_jh[ii]
-                b_coefficient[ii][self.params['oy_index'][self.corners['node2'][ii]]] = _corner_b_jk[ii] - _corner_b_jh[ii]
-                b_coefficient[ii][self.params['ox_index'][self.corners['node3'][ii]]] = - _corner_a_jk[ii]
-                b_coefficient[ii][self.params['oy_index'][self.corners['node3'][ii]]] = - _corner_b_jk[ii]
+                if self.params['ox_index'][self.corners['node1'][ii]] >= 0:
+                    b_coefficient[ii][self.params['ox_index'][self.corners['node1'][ii]]] = _corner_a_jh[ii]
+                    b_coefficient[ii][self.params['oy_index'][self.corners['node1'][ii]]] = _corner_b_jh[ii]
+                if self.params['ox_index'][self.corners['node2'][ii]] >= 0:
+                    b_coefficient[ii][self.params['ox_index'][self.corners['node2'][ii]]] = _corner_a_jk[ii] - _corner_a_jh[ii]
+                    b_coefficient[ii][self.params['oy_index'][self.corners['node2'][ii]]] = _corner_b_jk[ii] - _corner_b_jh[ii]
+                if self.params['ox_index'][self.corners['node3'][ii]] >= 0:
+                    b_coefficient[ii][self.params['ox_index'][self.corners['node3'][ii]]] = - _corner_a_jk[ii]
+                    b_coefficient[ii][self.params['oy_index'][self.corners['node3'][ii]]] = - _corner_b_jk[ii]
                 l_observation_residual[ii] = l_observation[ii] - np.arctan(_corner_delta_y_jk[ii] / _corner_delta_x_jk[
                     ii]) + np.arctan(_corner_delta_y_jh[ii] / _corner_delta_x_jh[ii])
-            # l_observation_residual = l_observation + np.dot(b_coefficient, x_params)
+            l_observation_residual_test = l_observation - np.dot(b_coefficient, x_params)
             x_params_correct = np.dot(np.dot(np.dot(np.linalg.inv(np.dot(np.dot(
                 b_coefficient.T, self.p_weight_matrix), b_coefficient)), b_coefficient.T), self.p_weight_matrix),
                 l_observation_residual)
