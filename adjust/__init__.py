@@ -72,8 +72,8 @@ class Daoxian:
 
     def init_params(self, params=None):
         if params is None:
-            ox = [284.43, 269.011, 163.475, 152.66, 97.35, 184.45, 278.44, 192.65, 178.77]
-            oy = [242.22, 292.728, 292.866, 264.52, 155.83, 90.89, 124.98, 225.76, 225.33]
+            ox = [2.949952113629291e+02,2.741299260170991e+02,1.765619845663307e+02,1.169321647434868e+02,97.478000000000000,1.848330000000000e+02,2.481246667084916e+02,2.319603068807433e+02,1.618231758855340e+02]
+            oy = [2.143301466876269e+02,2.768216846925721e+02,3.117517874055519e+02,2.359019975832601e+02,1.556820000000000e+02,90.147000000000000,1.227968250903668e+02,2.244367909013098e+02,2.196802847795701e+02]
             ox_index = [i for i in range(len(ox))]
             oy_index = [i for i in range(len(ox) - 2, len(ox) * 2 - 2)]
             for ii in range(len(self.known_poi)):
@@ -113,9 +113,6 @@ class Daoxian:
         b_coefficient = np.zeros((n_num, t_num))
 
         edge_function = self.edges
-        # edge_function = edge_function[~edge_function['value'].isin([0])]
-        # edge_function_index = [edge_function['node1']]
-
         corner_function = self.corners
 
         l_observation_corner = [i for i in self.corners['value']]
@@ -123,7 +120,7 @@ class Daoxian:
         l_observation_corner.extend(l_observation_edge)
         l_observation = np.array(l_observation_corner).reshape((-1, 1))
 
-        l_observation_residual = l_observation
+        l_observation_residual = l_observation * 2.0
 
         for iteration in range(100):
             _all_xy_coordinate = {'ox': x_params[0:t_num_half], 'oy': x_params[t_num_half:]}
@@ -132,11 +129,11 @@ class Daoxian:
                                                      self.known_poi['poi_x'][poi])
                 _all_xy_coordinate['oy'] = np.insert(_all_xy_coordinate['oy'], self.known_poi['poi_name'][poi],
                                                      self.known_poi['poi_y'][poi])
-            # for edge
-            _edge_delta_x_jk = _all_xy_coordinate['ox'][edge_function['node1']] - _all_xy_coordinate[
-                'ox'][edge_function['node2']]
-            _edge_delta_y_jk = _all_xy_coordinate['oy'][edge_function['node1']] - _all_xy_coordinate[
-                'oy'][edge_function['node2']]
+            # for edge ?
+            _edge_delta_x_jk = _all_xy_coordinate['ox'][edge_function['node2']] - _all_xy_coordinate[
+                'ox'][edge_function['node1']]
+            _edge_delta_y_jk = _all_xy_coordinate['oy'][edge_function['node2']] - _all_xy_coordinate[
+                'oy'][edge_function['node1']]
             _edge_s_jk = np.power(np.power(_edge_delta_x_jk, 2) + np.power(_edge_delta_y_jk, 2), 0.5)
             _edge_c_jk = _edge_delta_x_jk / _edge_s_jk
             _edge_d_jk = _edge_delta_y_jk / _edge_s_jk
@@ -148,7 +145,7 @@ class Daoxian:
                     b_coefficient[ii + n_num_corner][self.params['ox_index'][self.edges['node2'][ii]]] = _edge_c_jk[ii]
                     b_coefficient[ii + n_num_corner][self.params['oy_index'][self.edges['node2'][ii]]] = _edge_d_jk[ii]
                 l_observation_residual[ii + n_num_corner] = l_observation[ii + n_num_corner] - _edge_s_jk[ii]
-            # for corner
+            # for corner √
             _corner_delta_x_jk = _all_xy_coordinate['ox'][corner_function['node2']] - _all_xy_coordinate['ox'][
                 corner_function['node3']]
             _corner_delta_y_jk = _all_xy_coordinate['oy'][corner_function['node2']] - _all_xy_coordinate['oy'][
@@ -163,6 +160,8 @@ class Daoxian:
             _corner_b_jk = - self.rho * _corner_delta_x_jk / _corner_s_jk_power2
             _corner_a_jh = self.rho * _corner_delta_y_jh / _corner_s_jh_power2
             _corner_b_jh = - self.rho * _corner_delta_x_jh / _corner_s_jh_power2
+            _corner_jh = np.arctan2(- _corner_delta_y_jh, - _corner_delta_x_jh)
+            _corner_jk = np.arctan2(- _corner_delta_y_jk, - _corner_delta_x_jk)
             for ii in range(n_num_corner):
                 if self.params['ox_index'][self.corners['node1'][ii]] >= 0:
                     b_coefficient[ii][self.params['ox_index'][self.corners['node1'][ii]]] = _corner_a_jh[ii]
@@ -173,9 +172,7 @@ class Daoxian:
                 if self.params['ox_index'][self.corners['node3'][ii]] >= 0:
                     b_coefficient[ii][self.params['ox_index'][self.corners['node3'][ii]]] = - _corner_a_jk[ii]
                     b_coefficient[ii][self.params['oy_index'][self.corners['node3'][ii]]] = - _corner_b_jk[ii]
-                l_observation_residual[ii] = l_observation[ii] - np.arctan(_corner_delta_y_jk[ii] / _corner_delta_x_jk[
-                    ii]) + np.arctan(_corner_delta_y_jh[ii] / _corner_delta_x_jh[ii])
-            l_observation_residual_test = l_observation - np.dot(b_coefficient, x_params)
+                l_observation_residual[ii] = l_observation[ii] - np.mod(_corner_jk[ii] - _corner_jh[ii], 2 * np.pi)
             x_params_correct = np.dot(np.dot(np.dot(np.linalg.inv(np.dot(np.dot(
                 b_coefficient.T, self.p_weight_matrix), b_coefficient)), b_coefficient.T), self.p_weight_matrix),
                 l_observation_residual)
