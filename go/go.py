@@ -1,4 +1,4 @@
-from adjust import Daoxian
+from pc import Daoxian
 
 
 info1 = """ 0 -- 1	65.893
