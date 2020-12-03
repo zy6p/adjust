@@ -6,53 +6,25 @@
 </head>
 <body>
 <h1>dxw adjust app</h1>
-<p>填入以下数据，然后提交。
-以下数据为示例数据，通常只需要复制导线网程序表格即可。</p>
+<p>填入以下数据，然后提交。以下数据为示例数据，通常只需要复制导线网程序表格（勿手敲）。</p>
     <form action="/dxw/" method="post">
         {% csrf_token %}
         <label>
             边观测值：
-            <textarea name = "info1" rows = "11" cols = "16"> 0 -- 1	65.893
- 1 -- 2	103.656
- 2 -- 3	96.446
- 3 -- 4	82.557
- 4 -- 5	已知值
- 5 -- 6	71.194
- 6 -- 0	102.801
- 0 -- 7	63.84
- 7 -- 8	70.315
- 8 -- 3	47.726</textarea>
+            <textarea name = "info1" rows = "11" cols = "16">{{ info1 }}</textarea>
         </label><br />
         <label>
             角观测值：
-            <textarea name = "info2" rows = "14" cols = "25">∠0 1 2	231°50′15.1″
-∠1 0 6	134°25′21.9″
-∠1 0 7	62°25′37.2″
-∠1 2 3	251°31′27.3″
-∠2 3 4	204°32′33.3″
-∠2 3 8	288°18′12.4″
-∠3 4 5	246°45′15.2″
-∠4 3 8	83°45′53.7″
-∠4 5 6	244°09′57.8″
-∠5 6 0	215°35′53.8″
-∠6 0 7	288°00′32″
-∠0 7 8	192°59′25.3″
-∠7 8 3	156°15′13.5″</textarea>
+            <textarea name = "info2" rows = "14" cols = "25">{{ info2 }}</textarea>
         </label><br />
         <label>
             其他信息：
-            <textarea name = "info3" rows = "6" cols = "53">已知点：4 x=97.478(m), y=155.682(m)
-已知点：5 x=184.833(m), y=90.147(m)
-测边误差：1/2000
-测角误差：12</textarea>
+            <textarea name = "info3" rows = "6" cols = "53">{{ info3 }}</textarea>
         </label><br />
         <input type="submit" value="提交" />
     </form>
-    <p>edges observation</p>
     {{ edges|safe }}
-    <p>corners observation</p>
     {{ corners|safe }}
-    <p>params</p>
     {{ params|safe }}
 
 

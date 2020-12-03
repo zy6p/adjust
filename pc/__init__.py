@@ -5,7 +5,7 @@ import pandas as pd
 
 
 class Daoxian:
-    def __init__(self, info1='', info2='', info3='', weight_ratio=1):
+    def __init__(self, info1='', info2='', info3='', weight_ratio=206.265):
         self.weight_ratio = weight_ratio  # deg 1 ss = length 1 mm
         self.info1 = info1.replace('\r\n', '\n')
         self.info2 = info2.replace('\r\n', '\n')
@@ -106,7 +106,7 @@ class Daoxian:
         return True
 
     def init_weight(self):
-        p_weight_edge = [np.power(self.error['corner'] / (i * self.error['edge']), 2)
+        p_weight_edge = [np.power(self.error['corner'] / (i * self.error['edge'] * self.weight_ratio), 2)
                          for i in self.edges['value']]
         p_weight_matrix = [1 for i in range(len(self.corners))]
         p_weight_matrix.extend(p_weight_edge)
@@ -153,15 +153,18 @@ class Daoxian:
             _edge_d_jk = _edge_delta_y_jk / _edge_s_jk
             for ii in range(n_num_edge):
                 if self.params['origin_x_index'][self.edges['node1'][ii]] >= 0:
-                    b_coefficient[ii + n_num_corner][self.params['origin_x_index'][self.edges['node1'][ii]]] = - \
+                    b_coefficient[ii + n_num_corner][self.params['origin_x_index'][self.edges['node1'][ii]]] = 1000 * - \
                         _edge_c_jk[ii]
-                    b_coefficient[ii + n_num_corner][self.params['origin_y_index'][self.edges['node1'][ii]]] = - \
-                        _edge_d_jk[ii]
+                    b_coefficient[ii + n_num_corner][self.params['origin_y_index'][self.edges['node1'][ii]]] = - 1000 * \
+                                                                                                               _edge_d_jk[
+                                                                                                                   ii]
                 if self.params['origin_x_index'][self.edges['node2'][ii]] >= 0:
-                    b_coefficient[ii + n_num_corner][self.params['origin_x_index'][self.edges['node2'][ii]]] = \
-                        _edge_c_jk[ii]
-                    b_coefficient[ii + n_num_corner][self.params['origin_y_index'][self.edges['node2'][ii]]] = \
-                        _edge_d_jk[ii]
+                    b_coefficient[ii + n_num_corner][self.params['origin_x_index'][self.edges['node2'][ii]]] = 1000 * \
+                                                                                                               _edge_c_jk[
+                                                                                                                   ii]
+                    b_coefficient[ii + n_num_corner][self.params['origin_y_index'][self.edges['node2'][ii]]] = 1000 * \
+                                                                                                               _edge_d_jk[
+                                                                                                                   ii]
                 l_observation_residual[ii + n_num_corner] = 1000 * (l_observation[ii + n_num_corner] - _edge_s_jk[ii])
             # for corner √
             _corner_delta_x_jk = _all_xy_coordinate['origin_x'][corner_function['node2']] - \
@@ -182,21 +185,27 @@ class Daoxian:
             _corner_jk = np.arctan2(- _corner_delta_y_jk, - _corner_delta_x_jk)
             for ii in range(n_num_corner):
                 if self.params['origin_x_index'][self.corners['node1'][ii]] >= 0:
-                    b_coefficient[ii][self.params['origin_x_index'][self.corners['node1'][ii]]] = - _corner_a_jh[ii]
-                    b_coefficient[ii][self.params['origin_y_index'][self.corners['node1'][ii]]] = - _corner_b_jh[ii]
-                if self.params['origin_x_index'][self.corners['node2'][ii]] >= 0:
-                    b_coefficient[ii][self.params['origin_x_index'][self.corners['node2'][ii]]] = - _corner_a_jk[ii] + \
-                                                                                                  _corner_a_jh[ii]
-                    b_coefficient[ii][self.params['origin_y_index'][self.corners['node2'][ii]]] = - _corner_b_jk[ii] + \
+                    b_coefficient[ii][self.params['origin_x_index'][self.corners['node1'][ii]]] = 206065 * - \
+                    _corner_a_jh[ii]
+                    b_coefficient[ii][self.params['origin_y_index'][self.corners['node1'][ii]]] = - 206065 * \
                                                                                                   _corner_b_jh[ii]
+                if self.params['origin_x_index'][self.corners['node2'][ii]] >= 0:
+                    b_coefficient[ii][self.params['origin_x_index'][self.corners['node2'][ii]]] = 206065 * (
+                                - _corner_a_jk[ii] + \
+                                _corner_a_jh[ii])
+                    b_coefficient[ii][self.params['origin_y_index'][self.corners['node2'][ii]]] = 206065 * (
+                                - _corner_b_jk[ii] + \
+                                _corner_b_jh[ii])
                 if self.params['origin_x_index'][self.corners['node3'][ii]] >= 0:
-                    b_coefficient[ii][self.params['origin_x_index'][self.corners['node3'][ii]]] = _corner_a_jk[ii]
-                    b_coefficient[ii][self.params['origin_y_index'][self.corners['node3'][ii]]] = _corner_b_jk[ii]
+                    b_coefficient[ii][self.params['origin_x_index'][self.corners['node3'][ii]]] = 206065 * _corner_a_jk[
+                        ii]
+                    b_coefficient[ii][self.params['origin_y_index'][self.corners['node3'][ii]]] = 206065 * _corner_b_jk[
+                        ii]
                 l_observation_residual[ii] = 206265 * (l_observation[ii] - np.mod(_corner_jk[ii] - _corner_jh[ii],
                                                                                   2 * np.pi))
             x_params_correct = np.dot(np.dot(np.dot(np.linalg.inv(np.dot(np.dot(
                 b_coefficient.T, self.p_weight_matrix), b_coefficient)), b_coefficient.T), self.p_weight_matrix),
-                l_observation_residual) / 1000
+                l_observation_residual)
             x_params += x_params_correct
             # plt.plot(_all_xy_coordinate['origin_y'], _all_xy_coordinate['origin_x'])
             # plt.show()
@@ -210,17 +219,17 @@ class Daoxian:
         corner_sigma_max = np.sqrt(np.max(np.diag(q_ll_covariance)[0:n_num_corner])) * sigma_final * self.error[
             'corner']
 
-        self.edges['edge_adjust'] = self.edges['value'].values.reshape((-1, 1)) + l_observation_residual[- n_num_edge:]
-        self.edges['edge_adjust_residual'] = - l_observation_residual[- n_num_edge:]
-        self.corners['corner_adjust'] = self.corners['value'].values.reshape((-1, 1)) - l_observation_residual[
-                                                                                        0:n_num_corner]
-        self.corners['corner_adjust_deg'] = self.corners['corner_adjust'] * 180 / np.pi
-        self.corners['corner_adjust_deg_ddd'] = np.floor(self.corners['corner_adjust_deg'].values)
+        self.edges['edge_adjust'] = _edge_s_jk
+        self.edges['edge_adjust_residual_mm'] = - l_observation_residual[- n_num_edge:]
+        self.corners['corner_adjust_rad'] = self.corners['value'].values.reshape((-1, 1)) - l_observation_residual[
+                                                                                            0:n_num_corner] / 206265
+        _corner_adjust_deg = self.corners['corner_adjust_rad'] * 180 / np.pi
+        self.corners['corner_adjust_deg_ddd'] = np.floor(_corner_adjust_deg.values)
         self.corners['corner_adjust_deg_mm'] = np.floor(
-            (self.corners['corner_adjust_deg'].values - self.corners['corner_adjust_deg_ddd'].values) * 60)
-        self.corners['corner_adjust_deg_ss'] = (self.corners['corner_adjust_deg'].values - self.corners[
+            (_corner_adjust_deg.values - self.corners['corner_adjust_deg_ddd'].values) * 60)
+        self.corners['corner_adjust_deg_ss'] = (_corner_adjust_deg.values - self.corners[
             'corner_adjust_deg_ddd'].values) * 3600 - self.corners['corner_adjust_deg_mm'].values * 60
-        self.corners['corner_adjust_residual_deg_ss'] = - l_observation_residual[0:n_num_corner] * 206265
+        self.corners['corner_adjust_residual_deg_ss'] = - l_observation_residual[0:n_num_corner]
 
         self.intermediates['b_coefficient'] = b_coefficient
         self.intermediates['l_observation_residual'] = l_observation_residual

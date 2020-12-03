@@ -18,6 +18,6 @@ from django.urls import path
 from go import dxw
 
 urlpatterns = [
-    path('dxw/', dxw.search_post),
+    path('dxw/', dxw.cal_dxw),
     path('admin/', admin.site.urls),
 ]
