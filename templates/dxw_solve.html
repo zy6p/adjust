@@ -5,6 +5,9 @@
 <title>导线网平差解算</title>
 </head>
 <body>
+<h1>dxw adjust app</h1>
+<p>填入以下数据，然后提交。
+以下数据为示例数据，通常只需要复制导线网程序表格即可。</p>
     <form action="/dxw/" method="post">
         {% csrf_token %}
         <label>
@@ -38,16 +41,20 @@
         </label><br />
         <label>
             其他信息：
-            <textarea name = "info3" rows = "5" cols = "33">已知点：4 x=97.478(m), y=155.682(m)
+            <textarea name = "info3" rows = "6" cols = "53">已知点：4 x=97.478(m), y=155.682(m)
 已知点：5 x=184.833(m), y=90.147(m)
 测边误差：1/2000
 测角误差：12</textarea>
         </label><br />
         <input type="submit" value="提交" />
     </form>
-<table class="dataframe">
-{{ result }}
-</table>
+    <p>edges observation</p>
+    {{ edges|safe }}
+    <p>corners observation</p>
+    {{ corners|safe }}
+    <p>params</p>
+    {{ params|safe }}
+
 
 </body>
 </html>

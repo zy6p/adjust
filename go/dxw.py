@@ -9,14 +9,18 @@ from pc import Daoxian
 def search_post(request):
     ctx = {}
     if request.POST:
-        ctx['result'] = request.POST
+        ctx['params'] = request.POST
         try:
             dxw = Daoxian(request.POST['info1'], request.POST['info2'], request.POST['info3'])
             dxw.check_info()
             dxw.init_params()
             dxw.init_weight()
             dxw.cal()
-            ctx['result'] = dxw.params_to_html_th()
+            ctx['params'] = dxw.params_to_html_th()
+            ctx['edges'] = dxw.edges_to_html_th()
+            ctx['corners'] = dxw.corners_to_html_th()
         except:
-            ctx['result'] = 'error input'
+            ctx['params'] = 'error input'
+            ctx['edges'] = 'error input'
+            ctx['corners'] = 'error input'
     return render(request, "dxw_solve.html", ctx)
