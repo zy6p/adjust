@@ -7,9 +7,9 @@ import pandas as pd
 class Daoxian:
     def __init__(self, info1='', info2='', info3=''):
         self.rho = 1
-        self.info1 = info1
-        self.info2 = info2
-        self.info3 = info3
+        self.info1 = info1.replace('\r\n', '\n')
+        self.info2 = info2.replace('\r\n', '\n')
+        self.info3 = info3.replace('\r\n', '\n')
         self.edges = pd.DataFrame({"node1": [], "node2": [], "value": []})
         self.corners = pd.DataFrame({"node1": [], "node2": [], "node3": [], "value": []})
         self.known_poi = pd.DataFrame({"poi_name": [], "poi_x": [], "poi_y": []})
@@ -27,12 +27,12 @@ class Daoxian:
         for edge in edges:
             if len(edge) == 0:
                 pass
-            elif len(edge) == 11:
+            elif edge.endswith('已知值'):
                 pass
                 # edges_observation['node1'].append(int(edge[1]))
                 # edges_observation['node2'].append(int(edge[6]))
                 # edges_observation['value'].append(0)
-            elif len(edge) > 11:
+            elif len(edge) > 13:
                 edges_observation['node1'].append(int(edge[1]))
                 edges_observation['node2'].append(int(edge[6]))
                 edges_observation['value'].append(float(edge[8:]))
@@ -214,9 +214,15 @@ class Daoxian:
             'corner_adjust_deg_ddd'].values) * 3600 - self.corners['corner_adjust_deg_mm'].values * 60
         self.corners['corner_adjust_residual_deg_ss'] = - l_observation_residual[0:n_num_corner] * 206265
 
-        # self.intermediates['b_coefficient'] = b_coefficient
-        # self.intermediates['l_observation_residual'] = l_observation_residual
-        # self.intermediates['x_params'] = x_params
-        # self.params['rx'] = _all_xy_coordinate['ox']
-        # self.params['ry'] = _all_xy_coordinate['oy']
+        self.intermediates['b_coefficient'] = b_coefficient
+        self.intermediates['l_observation_residual'] = l_observation_residual
+        self.intermediates['x_params'] = x_params
+        self.params['rx'] = _all_xy_coordinate['ox']
+        self.params['ry'] = _all_xy_coordinate['oy']
         return True
+
+    def params_to_html_th(self):
+        out_params = self.params.to_html(columns=['rx', 'ry'])
+        temp = out_params.split('\n')
+        final_out_params = '\n'.join(temp[1:])
+        return out_params

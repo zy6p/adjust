@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from go import dxw
 
 urlpatterns = [
+    path('dxw/', dxw.search_post),
     path('admin/', admin.site.urls),
 ]
