@@ -33,7 +33,7 @@ class Daoxian:
                 # edges_observation['node1'].append(int(edge[1]))
                 # edges_observation['node2'].append(int(edge[6]))
                 # edges_observation['value'].append(0)
-            elif len(edge) > 13:
+            elif len(edge) > 10:
                 edges_observation['node1'].append(int(edge[1]))
                 edges_observation['node2'].append(int(edge[6]))
                 edges_observation['value'].append(float(edge[8:]))
@@ -153,18 +153,11 @@ class Daoxian:
             _edge_d_jk = _edge_delta_y_jk / _edge_s_jk
             for ii in range(n_num_edge):
                 if self.params['origin_x_index'][self.edges['node1'][ii]] >= 0:
-                    b_coefficient[ii + n_num_corner][self.params['origin_x_index'][self.edges['node1'][ii]]] = 1000 * - \
-                        _edge_c_jk[ii]
-                    b_coefficient[ii + n_num_corner][self.params['origin_y_index'][self.edges['node1'][ii]]] = - 1000 * \
-                                                                                                               _edge_d_jk[
-                                                                                                                   ii]
+                    b_coefficient[ii + n_num_corner][self.params['origin_x_index'][self.edges['node1'][ii]]] = - 1000 * _edge_c_jk[ii]
+                    b_coefficient[ii + n_num_corner][self.params['origin_y_index'][self.edges['node1'][ii]]] = - 1000 * _edge_d_jk[ii]
                 if self.params['origin_x_index'][self.edges['node2'][ii]] >= 0:
-                    b_coefficient[ii + n_num_corner][self.params['origin_x_index'][self.edges['node2'][ii]]] = 1000 * \
-                                                                                                               _edge_c_jk[
-                                                                                                                   ii]
-                    b_coefficient[ii + n_num_corner][self.params['origin_y_index'][self.edges['node2'][ii]]] = 1000 * \
-                                                                                                               _edge_d_jk[
-                                                                                                                   ii]
+                    b_coefficient[ii + n_num_corner][self.params['origin_x_index'][self.edges['node2'][ii]]] = 1000 * _edge_c_jk[ii]
+                    b_coefficient[ii + n_num_corner][self.params['origin_y_index'][self.edges['node2'][ii]]] = 1000 * _edge_d_jk[ii]
                 l_observation_residual[ii + n_num_corner] = 1000 * (l_observation[ii + n_num_corner] - _edge_s_jk[ii])
             # for corner √
             _corner_delta_x_jk = _all_xy_coordinate['origin_x'][corner_function['node2']] - \
@@ -185,17 +178,13 @@ class Daoxian:
             _corner_jk = np.arctan2(- _corner_delta_y_jk, - _corner_delta_x_jk)
             for ii in range(n_num_corner):
                 if self.params['origin_x_index'][self.corners['node1'][ii]] >= 0:
-                    b_coefficient[ii][self.params['origin_x_index'][self.corners['node1'][ii]]] = 206065 * - \
-                    _corner_a_jh[ii]
-                    b_coefficient[ii][self.params['origin_y_index'][self.corners['node1'][ii]]] = - 206065 * \
-                                                                                                  _corner_b_jh[ii]
+                    b_coefficient[ii][self.params['origin_x_index'][self.corners['node1'][ii]]] = - 206065 * _corner_a_jh[ii]
+                    b_coefficient[ii][self.params['origin_y_index'][self.corners['node1'][ii]]] = - 206065 * _corner_b_jh[ii]
                 if self.params['origin_x_index'][self.corners['node2'][ii]] >= 0:
                     b_coefficient[ii][self.params['origin_x_index'][self.corners['node2'][ii]]] = 206065 * (
-                                - _corner_a_jk[ii] + \
-                                _corner_a_jh[ii])
+                                - _corner_a_jk[ii] + _corner_a_jh[ii])
                     b_coefficient[ii][self.params['origin_y_index'][self.corners['node2'][ii]]] = 206065 * (
-                                - _corner_b_jk[ii] + \
-                                _corner_b_jh[ii])
+                                - _corner_b_jk[ii] + _corner_b_jh[ii])
                 if self.params['origin_x_index'][self.corners['node3'][ii]] >= 0:
                     b_coefficient[ii][self.params['origin_x_index'][self.corners['node3'][ii]]] = 206065 * _corner_a_jk[
                         ii]

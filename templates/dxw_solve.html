@@ -5,8 +5,10 @@
 <title>导线网平差解算</title>
 </head>
 <body>
-<h1>dxw adjust app</h1>
+<h1>导线网平差解算</h1>
 <p>填入以下数据，然后提交。以下数据为示例数据，通常只需要复制导线网程序表格（勿手敲）。</p>
+<p>定权问题正在完善。</p>
+<p>使用教程见<a href="https://www.hotdry.top/dxw/">hello</a></p>
     <form action="/dxw/" method="post">
         {% csrf_token %}
         <label>
@@ -19,7 +21,7 @@
         </label><br />
         <label>
             其他信息：
-            <textarea name = "info3" rows = "6" cols = "53">{{ info3 }}</textarea>
+            <textarea name = "info3" rows = "5" cols = "53">{{ info3 }}</textarea>
         </label><br />
         <input type="submit" value="提交" />
     </form>
