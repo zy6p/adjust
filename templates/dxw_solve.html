@@ -14,7 +14,7 @@
         <label>
             边观测值：
             <textarea name = "info1" rows = "11" cols = "16">{{ info1 }}</textarea>
-        </label><br />
+        </label>
         <label>
             角观测值：
             <textarea name = "info2" rows = "14" cols = "25">{{ info2 }}</textarea>
@@ -23,6 +23,10 @@
             其他信息：
             <textarea name = "info3" rows = "5" cols = "53">{{ info3 }}</textarea>
         </label><br />
+        <label>
+            weight_ratio
+            <input type="text" name="weight_ratio" value="1">
+        </label><br>
         <input type="submit" value="提交" />
     </form>
     {{ edges|safe }}

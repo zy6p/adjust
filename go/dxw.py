@@ -38,17 +38,18 @@ info3 = '''已知点：4 x=97.478(m), y=155.682(m)
 测边误差：1/2000
 测角误差：12"'''
 
+weight_ratio = '1'
 
 # 接收POST请求数据
 def cal_dxw(request):
     ctx = {
-        'info1': info1, 'info2': info2, 'info3': info3
+        'info1': info1, 'info2': info2, 'info3': info3, 'weight_ratio': weight_ratio
     }
     if request.POST:
         ctx['params'] = 'producing'
         try:
-            ctx['info1'], ctx['info2'], ctx['info3'] = request.POST['info1'], request.POST['info2'], request.POST['info3']
-            dxw = Daoxian(ctx['info1'], ctx['info2'], ctx['info3'])
+            ctx['info1'], ctx['info2'], ctx['info3'], ctx['weight_ratio'] = request.POST['info1'], request.POST['info2'], request.POST['info3'], request.POST['weight_ratio']
+            dxw = Daoxian(ctx['info1'], ctx['info2'], ctx['info3'], ctx['weight_ratio'])
             dxw.check_info()
             dxw.init_params()
             dxw.init_weight()

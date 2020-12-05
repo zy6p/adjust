@@ -5,8 +5,8 @@ import pandas as pd
 
 
 class Daoxian:
-    def __init__(self, info1='', info2='', info3='', weight_ratio=206.265):
-        self.weight_ratio = weight_ratio  # deg 1 ss = length 1 mm
+    def __init__(self, info1='', info2='', info3='', weight_ratio='1'):
+        self.weight_ratio = eval(weight_ratio)  # deg 1 ss = length 1 mm
         self.info1 = info1.replace('\r\n', '\n')
         self.info2 = info2.replace('\r\n', '\n')
         self.info3 = info3.replace('\r\n', '\n')
@@ -106,7 +106,7 @@ class Daoxian:
         return True
 
     def init_weight(self):
-        p_weight_edge = [np.power(self.error['corner'] / (i * self.error['edge'] * self.weight_ratio), 2)
+        p_weight_edge = [np.power(self.error['corner'] / (i * self.error['edge'] / self.weight_ratio), 2)
                          for i in self.edges['value']]
         p_weight_matrix = [1 for i in range(len(self.corners))]
         p_weight_matrix.extend(p_weight_edge)
