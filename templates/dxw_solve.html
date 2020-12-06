@@ -7,7 +7,7 @@
 <body>
 <h1>导线网平差解算</h1>
 <p>填入以下数据，然后提交。以下数据为示例数据，通常只需要复制导线网程序表格（勿手敲）。</p>
-<p>定权问题正在完善。</p>
+<p>更新：1. 已能生成误差模型；2. 已能生成平差报告；3. 已开放中间变量</p>
 <p>使用教程见<a href="https://www.hotdry.top/dxw/">hello</a></p>
     <form action="/dxw/" method="post">
         {% csrf_token %}
@@ -29,10 +29,20 @@
         </label><br>
         <input type="submit" value="提交" />
     </form>
+    {{ adjust_result|safe }}
     {{ edges|safe }}
     {{ corners|safe }}
     {{ params|safe }}
+    {{ edge_sigma_max|safe }}
+    {{ corner_sigma_max|safe }}
+    {{ point_sigma_max|safe }}
+    {{ sigma_final|safe }}
 
+    {{ intermediates|safe }}
+    {{ b_coefficient|safe }}
+    {{ l_observation_residual|safe }}
+    {{ v_residual|safe }}
+    {{ P_weight_matrix|safe }}
 
 </body>
 </html>

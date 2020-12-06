@@ -201,15 +201,24 @@ class Daoxian:
 
         # cal weight intermediates result
         v_residual = - l_observation_residual
-        sigma_final = np.sqrt(np.dot(np.dot(v_residual.T, self.p_weight_matrix), v_residual) / (n_num - t_num))
+        sigma_final = np.sqrt(np.dot(np.dot(v_residual.T, self.p_weight_matrix), v_residual) / (n_num - t_num))[0, 0]
         q_xx_covariance = np.linalg.inv(np.dot(np.dot(b_coefficient.T, self.p_weight_matrix), b_coefficient))
         q_ll_covariance = np.dot(np.dot(b_coefficient, q_xx_covariance), b_coefficient.T)
-        edge_sigma_max = np.sqrt(np.max(np.diag(q_ll_covariance)[- n_num_edge:])) * sigma_final * self.error['corner']
-        corner_sigma_max = np.sqrt(np.max(np.diag(q_ll_covariance)[0:n_num_corner])) * sigma_final * self.error[
-            'corner']
+        edge_sigma_max = np.sqrt(np.max(np.diag(q_ll_covariance)[- n_num_edge:])) * sigma_final * self.weight_ratio
+        corner_sigma_max = np.sqrt(np.max(np.diag(q_ll_covariance)[0:n_num_corner])) * sigma_final
+        _q_point_covariance = np.diag(q_xx_covariance).reshape((-1, 2))
+        q_point_covariance = np.power(_q_point_covariance[:, 0] + _q_point_covariance[:, 1], 0.5) * sigma_final
+        for poi in range(known_num):
+            q_point_covariance = np.insert(q_point_covariance, self.known_poi['poi_name'][poi], 0)
+        self.params['point_sigma'] = q_point_covariance
+        self.error['point_sigma_max'] = max(q_point_covariance)
+        self.error['edge_sigma_max'] = edge_sigma_max
+        self.error['corner_sigma_max'] = corner_sigma_max
+        self.error['sigma_final'] = sigma_final
 
         self.edges['edge_adjust'] = _edge_s_jk
         self.edges['edge_adjust_residual_mm'] = - l_observation_residual[- n_num_edge:]
+        self.edges['edge_post_test_error'] = np.sqrt(np.diag(q_ll_covariance)[- n_num_edge:]) * self.weight_ratio * sigma_final
         self.corners['corner_adjust_rad'] = self.corners['value'].values.reshape((-1, 1)) - l_observation_residual[
                                                                                             0:n_num_corner] / 206265
         _corner_adjust_deg = self.corners['corner_adjust_rad'] * 180 / np.pi
@@ -219,10 +228,13 @@ class Daoxian:
         self.corners['corner_adjust_deg_ss'] = (_corner_adjust_deg.values - self.corners[
             'corner_adjust_deg_ddd'].values) * 3600 - self.corners['corner_adjust_deg_mm'].values * 60
         self.corners['corner_adjust_residual_deg_ss'] = - l_observation_residual[0:n_num_corner]
+        self.corners['corner_post_test_error'] = np.sqrt(np.diag(q_ll_covariance)[0:n_num_corner]) * sigma_final
 
-        self.intermediates['b_coefficient'] = b_coefficient
-        self.intermediates['l_observation_residual'] = l_observation_residual
-        self.intermediates['x_params'] = x_params
+        self.intermediates['b_coefficient'] = pd.DataFrame(b_coefficient).to_html()
+        self.intermediates['l_observation_residual'] = pd.DataFrame(l_observation_residual).to_html()
+        self.intermediates['v_residual'] = pd.DataFrame(v_residual).to_html()
+        self.intermediates['P_weight_matrix'] = pd.DataFrame(self.p_weight_matrix).to_html()
+        # self.intermediates['x_params'] = x_params
         self.params['adjust_x'] = _all_xy_coordinate['origin_x']
         self.params['adjust_y'] = _all_xy_coordinate['origin_y']
         return True
@@ -231,7 +243,7 @@ class Daoxian:
         # out_params = self.params.to_html(columns=['adjust_x', 'adjust_y'])
         # temp = out_params.split('\n')
         # final_out_params = '\n'.join(temp[1:])
-        return self.params.to_html(columns=['adjust_x', 'adjust_y'])
+        return self.params.to_html(columns=['adjust_x', 'adjust_y', 'point_sigma'])
 
     def edges_to_html_th(self):
         return self.edges.to_html()

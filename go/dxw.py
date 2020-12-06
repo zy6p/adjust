@@ -54,11 +54,20 @@ def cal_dxw(request):
             dxw.init_params()
             dxw.init_weight()
             dxw.cal()
+            ctx['adjust_result'] = '<h2>平差结果</h2>'
             ctx['params'] = '<p>params</p>' + dxw.params_to_html_th()
             ctx['edges'] = '<p>edges observation</p>' + dxw.edges_to_html_th()
             ctx['corners'] = '<p>corners observation</p>' + dxw.corners_to_html_th()
+            ctx['edge_sigma_max'] = '<p>平差后最弱边中误差（mm）</p>' + dxw.error['edge_sigma_max'].__str__()
+            ctx['corner_sigma_max'] = '<p>平差后最弱角中误差（″）</p>' + dxw.error['corner_sigma_max'].__str__()
+            ctx['point_sigma_max'] = '<p>平差后最弱点位中误差（mm）</p>' + dxw.error['point_sigma_max'].__str__()
+            ctx['sigma_final'] = '<p>平差后单位权中误差（″）</p>' + dxw.error['sigma_final'].__str__()
+
+            ctx['intermediates'] = '<h2>中间变量</h2>'
+            ctx['b_coefficient'] = '<p>系数矩阵 B. 其中角度单位为″，长度单位为mm</p>' + dxw.intermediates['b_coefficient']
+            ctx['l_observation_residual'] = '<p>辅助量 l. 其中角度单位为″，长度单位为mm</p>' + dxw.intermediates['l_observation_residual']
+            ctx['v_residual'] = '<p>观测值改正数 v. 其中角度单位为″，长度单位为mm</p>' + dxw.intermediates['v_residual']
+            ctx['P_weight_matrix'] = '<p>权重矩阵 P</p>' + dxw.intermediates['P_weight_matrix']
         except:
-            ctx['params'] = '<p>error input</p>'
-            ctx['edges'] = ''
-            ctx['corners'] = ''
+            ctx['adjust_result'] = '<p>error input</p>'
     return render(request, "dxw_solve.html", ctx)
