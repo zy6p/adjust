@@ -1,6 +1,8 @@
 import copy
+
 import numpy as np
 import pandas as pd
+
 from .inverseadjust import DxwInverseAdjust
 
 
@@ -79,14 +81,15 @@ class Daoxian:
                 edges_observation['value'].append(float(edge[8:]))
         self.edges = pd.DataFrame(edges_observation)
 
+    # TODO: This calculation method is sensitive to the initial value, so need to calculate the initial value first.
     def init_params(self, params=None):
         if params is None:
-            origin_x = [2.949952113629291e+02, 2.741299260170991e+02, 1.765619845663307e+02, 1.169321647434868e+02,
-                        97.478000000000000, 1.848330000000000e+02, 2.481246667084916e+02, 2.319603068807433e+02,
-                        1.618231758855340e+02]
-            origin_y = [2.143301466876269e+02, 2.768216846925721e+02, 3.117517874055519e+02, 2.359019975832601e+02,
-                        1.556820000000000e+02, 90.147000000000000, 1.227968250903668e+02, 2.244367909013098e+02,
-                        2.196802847795701e+02]
+            origin_x = [2.870990000000000e+02, 1.919990000000000e+02, 1.406959751853701e+02, 1.492484041733704e+02,
+                        2.045984049476477e+02, 2.819792529204340e+02, 3.275893976516628e+02, 2.154350873574551e+02,
+                        2.556998807055271e+02]
+            origin_y = [2.551870000000000e+02, 2.924290000000000e+02, 2.341834543352806e+02, 1.456793271234235e+02,
+                        81.853698181164750, 1.103393419062568e+02, 1.943975064036699e+02, 1.362573869669805e+02,
+                        2.137389646671174e+02]
             origin_x_index = [i for i in range(len(origin_x))]
             origin_y_index = [i for i in range(len(origin_x) - 2, len(origin_x) * 2 - 2)]
             for ii in range(len(self.known_poi)):
@@ -129,7 +132,8 @@ class Daoxian:
         l_observation_residual = l_observation * 2.0
 
         for iteration in range(20):
-            _all_xy_coordinate = {'origin_x': x_params[0:dxw_inverse_adjust.t_num_half], 'origin_y': x_params[dxw_inverse_adjust.t_num_half:]}
+            _all_xy_coordinate = {'origin_x': x_params[0:dxw_inverse_adjust.t_num_half],
+                                  'origin_y': x_params[dxw_inverse_adjust.t_num_half:]}
             for poi in range(dxw_inverse_adjust.known_num):
                 _all_xy_coordinate['origin_x'] = np.insert(_all_xy_coordinate['origin_x'],
                                                            self.known_poi['poi_name'][poi],
