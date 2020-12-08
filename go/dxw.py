@@ -2,7 +2,7 @@
 
 from django.shortcuts import render
 from django.views.decorators import csrf
-from pc import Daoxian
+from pc import daoxian
 
 info1 = """
  0 -- 1	65.893
@@ -40,6 +40,7 @@ info3 = '''已知点：4 x=97.478(m), y=155.682(m)
 
 weight_ratio = '1'
 
+
 # 接收POST请求数据
 def cal_dxw(request):
     ctx = {
@@ -49,15 +50,15 @@ def cal_dxw(request):
         ctx['params'] = 'producing'
         try:
             ctx['info1'], ctx['info2'], ctx['info3'], ctx['weight_ratio'] = request.POST['info1'], request.POST['info2'], request.POST['info3'], request.POST['weight_ratio']
-            dxw = Daoxian(ctx['info1'], ctx['info2'], ctx['info3'], ctx['weight_ratio'])
+            dxw = daoxian.Daoxian(ctx['info1'], ctx['info2'], ctx['info3'], ctx['weight_ratio'])
             dxw.check_info()
             dxw.init_params()
             dxw.init_weight()
             dxw.cal()
             ctx['adjust_result'] = '<h2>平差结果</h2>'
-            ctx['params'] = '<p>params</p>' + dxw.params_to_html_th()
-            ctx['edges'] = '<p>edges observation</p>' + dxw.edges_to_html_th()
-            ctx['corners'] = '<p>corners observation</p>' + dxw.corners_to_html_th()
+            ctx['params'] = '<p>params</p>' + dxw.html_of_params()
+            ctx['edges'] = '<p>edges observation</p>' + dxw.html_of_edges()
+            ctx['corners'] = '<p>corners observation</p>' + dxw.html_of_corners()
             ctx['edge_sigma_max'] = '<p>平差后最弱边中误差（mm）</p>' + dxw.error['edge_sigma_max'].__str__()
             ctx['corner_sigma_max'] = '<p>平差后最弱角中误差（″）</p>' + dxw.error['corner_sigma_max'].__str__()
             ctx['point_sigma_max'] = '<p>平差后最弱点位中误差（mm）</p>' + dxw.error['point_sigma_max'].__str__()

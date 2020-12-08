@@ -1,4 +1,4 @@
-from pc import Daoxian
+from pc import daoxian
 
 
 info1 = """
@@ -35,12 +35,12 @@ info3 = '''已知点：4 x=97.478(m), y=155.682(m)
 测边误差：1/2000
 测角误差：12"'''
 
-dx_test = Daoxian(info1, info2, info3)
+dx_test = daoxian.Daoxian(info1, info2, info3)
 dx_test.check_info()
 dx_test.init_params()
 dx_test.init_weight()
 dx_test.cal()
-dx_test.params_to_html_th()
+dx_test.html_of_params()
 
 '''
 [3.071326544877045e+02,2.283013983327644e+02,1.446664727003717e+02,97.478000000000000,1.556820000000000e+02,2.258786128042726e+02,2.482021546925351e+02,1.806911732611011e+02,3.035958218206701e+02]
