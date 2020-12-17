@@ -54,7 +54,7 @@ class Daoxian:
         for corner in corners:
             if len(corner) == 0:
                 pass
-            elif len(corner) > 15:
+            elif len(corner) > 13:
                 corners_observation['node1'].append(int(corner[1]))
                 corners_observation['node2'].append(int(corner[3]))
                 corners_observation['node3'].append(int(corner[5]))
