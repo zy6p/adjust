@@ -9,7 +9,7 @@ click-plugins==1.1.1
 click==7.1.2
 cligj==0.7.1
 curl==7.67.0
-django==2.2.5
+django==2.2.20
 expat==2.3.0
 fiona==1.8.13.post1
 fontconfig==2.13.1
