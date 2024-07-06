@@ -3,7 +3,7 @@ blas==1.0
 bzip2==1.0.8
 ca-certificates==2021.4.13
 cairo==1.14.12
-certifi==2023.7.22
+certifi==2024.7.4
 cfitsio==3.470
 click-plugins==1.1.1
 click==7.1.2
