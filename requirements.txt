@@ -83,7 +83,7 @@ python==3.8.2
 pytz==2021.1
 readline==7.0
 rtree==0.9.7
-setuptools==65.5.1
+setuptools==70.0.0
 shapely==1.7.1
 sip==6.0.3
 six==1.15.0
