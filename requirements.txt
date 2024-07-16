@@ -11,7 +11,7 @@ cligj==0.7.1
 curl==7.67.0
 django==3.2.25
 expat==2.3.0
-fiona==1.8.13.post1
+fiona==1.9.6
 fontconfig==2.13.1
 freetype==2.10.4
 freexl==1.0.6
